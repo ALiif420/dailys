@@ -1,0 +1,86 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Habit Builder</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--fg:#141414;--mu:#777;--ln:#d6d6d6;--sf:#eee;--ck:#141414;--ct:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121212;--fg:#f2f2f2;--mu:#999;--ln:#3a3a3a;--sf:#232323;--ck:#f2f2f2;--ct:#121212}}
+:root[data-theme="dark"]{--bg:#121212;--fg:#f2f2f2;--mu:#999;--ln:#3a3a3a;--sf:#232323;--ck:#f2f2f2;--ct:#121212}
+*{box-sizing:border-box}html,body{margin:0}body{background:var(--bg);color:var(--fg);font:14px/1.4 Inter,Arial,sans-serif;padding:0 16px 40px}
+.w{max-width:1180px;margin:auto}nav{display:flex;gap:4px;border-bottom:2px solid var(--fg);margin:16px 0 20px;overflow-x:auto}
+nav button{font:600 13px Inter,Arial;background:none;color:var(--mu);border:0;padding:10px 14px;cursor:pointer}nav button.on{background:var(--fg);color:var(--bg)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+h1{font:800 clamp(32px,7vw,56px)/1 Inter,Arial;margin:0}.mu{color:var(--mu)}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.big{font:800 34px Inter,Arial}.sm{font-size:12px}.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+select,input{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--ln);padding:6px 8px}
+.sc{overflow-x:auto;border-top:2px solid var(--fg);border-bottom:2px solid var(--fg)}table{border-collapse:collapse;width:100%}
+th,td{padding:2px;text-align:center;font-size:11px;font-weight:400}th{color:var(--mu);border-bottom:2px solid var(--fg)}
+.l{text-align:left;position:sticky;left:0;background:var(--bg);min-width:150px;padding:4px 8px 4px 0;font-size:13px;font-weight:600}
+.cb{width:22px;height:22px;border:1px solid var(--ln);background:var(--bg);cursor:pointer;padding:0;color:var(--ct);font:700 13px/1 Arial}.cb.on{background:var(--ck);border-color:var(--ck)}.cb.on::after{content:"✓"}
+.off .cb{visibility:hidden}.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:28px;margin-top:24px}
+h2{font:800 15px Inter,Arial;margin:0 0 8px;border-bottom:2px solid var(--fg);padding-bottom:6px}
+.ar{display:grid;grid-template-columns:1fr 1.4fr 56px 52px;gap:8px;align-items:center;padding:4px 0;font-size:12px;border-bottom:1px solid var(--ln)}
+.bar{height:10px;background:var(--sf)}.bar i{display:block;height:100%;background:var(--fg)}
+.days{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:18px}
+.dc h3{margin:0;background:var(--fg);color:var(--bg);text-align:center;padding:6px;font-size:14px}.dc .d{text-align:center;font-size:11px;color:var(--mu);margin:4px 0}
+.rg{position:relative;width:96px;margin:6px auto}.rg b{position:absolute;inset:0;display:grid;place-items:center;font-size:16px}
+.t{display:flex;gap:6px;align-items:center;border-bottom:1px solid var(--ln);padding:3px 0}.t input{flex:1;min-width:0;border:0;padding:3px;background:none}.t.dn input{text-decoration:line-through;color:var(--mu)}
+.btn{font:600 12px Inter,Arial;background:var(--fg);color:var(--bg);border:0;padding:7px 12px;cursor:pointer}
+.sr{display:grid;grid-template-columns:110px 1fr 90px;gap:10px;align-items:center;padding:4px 0;font-size:13px}
+.st{display:grid;grid-template-columns:28px 1fr 90px 40px;gap:8px;margin:4px 0}
+svg{display:block;width:100%}
+</style></head><body><div class="w">
+<nav id="nav"></nav><main id="app"></main></div>
+<script>
+const $=s=>document.querySelector(s),K="habit-alif-v1",MN=["January","February","March","April","May","June","July","August","September","October","November","December"],DN=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const pad=n=>String(n).padStart(2,"0"),iso=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()),pd=s=>{const[a,b,c]=s.split("-");return new Date(+a,b-1,+c)},add=(d,n)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+n),mon=d=>add(d,-((d.getDay()+6)%7));
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;"),pc=x=>Math.round(x*100)+"%";
+const seed=[["Bangun tanpa cek hp",1],["Workout/gym 45 menit",1],["Selesaikan 1 tugas penting",1],["Rapikan kamar",1],["Baca 10 halaman",1],["No stalking mantan",1]],
+seed2=[["Cardio 30 menit",1],["Belajar skill baru 30 menit",1],["Selesaikan mainwork",0],["Follow-up 1 klien",0],["Catat pengeluaran harian",0],["Tidur sebelum jam 23.00",0]],
+seed3=["Muaythai training","Selesaikan 1 task yang tertunda","Kerja on personal project","Baca 10 halaman","Grooming"].map(t=>[t,0]),
+seed4=["Cardio 30 menit","Kerja 4 jam no distraksi","Meeting sama asa","Evaluasi keuangan"].map(t=>[t,0]);
+const blankWeek=()=>Array.from({length:7},()=>Array.from({length:15},()=>({t:"",c:0})));
+let S=null;try{S=JSON.parse(localStorage.getItem(K))}catch(e){}
+if(!S){S={y:2026,h:[["Wake up at 4 AM",.8],["Sholat 5 Waktu",1],["Meditation",.8],["Gym",.8],["Reading a book",.8],["Journalling",.8],["No PMO",.8],["No Smoking",.8],["No cussing",.8],["Sleep at 10 PM",.8]],m:{},w:{}};
+const w=blankWeek();[seed,seed2,seed3,seed4].forEach((L,i)=>L.forEach((x,j)=>{w[i][j]={t:x[0],c:x[1]}}));S.w["2026-09-28"]=w}
+const now=new Date(),V={tab:"h",mo:now.getFullYear()==S.y?now.getMonth():0,wk:iso(mon(now))};
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
+const dim=mo=>new Date(S.y,mo+1,0).getDate();
+const gm=mo=>{const k=S.y+"-"+mo;S.m[k]=S.m[k]||[];S.h.forEach((_,i)=>{if(!S.m[k][i])S.m[k][i]=Array(31).fill(0)});return S.m[k]};
+const gw=k=>S.w[k]=S.w[k]||blankWeek();
+const ring=(p,s)=>`<svg viewBox="0 0 36 36" style="width:${s}px;margin:auto"><circle cx="18" cy="18" r="15" fill="none" stroke="var(--sf)" stroke-width="4"/><circle cx="18" cy="18" r="15" fill="none" stroke="var(--fg)" stroke-width="4" pathLength="100" stroke-dasharray="${p*100} 100" transform="rotate(-90 18 18)"/></svg>`;
+function area(v){const n=v.length,pt=v.map((y,i)=>[i/(n-1||1)*600,110-y*100]);return `<svg viewBox="0 0 600 120" preserveAspectRatio="none" style="height:120px"><path d="M0 110 ${pt.map(p=>"L"+p[0]+" "+p[1]).join(" ")} L600 110Z" fill="var(--sf)"/><path d="M${pt.map(p=>p[0]+" "+p[1]).join(" L")}" fill="none" stroke="var(--fg)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`}
+function bars(v,lab,h){const w=100/v.length;return `<svg viewBox="0 0 100 ${h}" preserveAspectRatio="none" style="height:${h}px">${v.map((y,i)=>`<rect x="${i*w+w*.15}" y="${h-14-y*(h-24)}" width="${w*.7}" height="${y*(h-24)+.01}" fill="var(--fg)"/>`).join("")}</svg><div class="row sm mu" style="gap:0">${lab.map(l=>`<span style="flex:1;text-align:center">${l}</span>`).join("")}</div>`}
+function habits(){const mo=V.mo,d=dim(mo),D=gm(mo),H=S.h.map((h,i)=>[h,i]).filter(x=>x[0][0].trim()),n=H.length,days=[...Array(d).keys()];
+const cnt=i=>D[i].slice(0,d).reduce((a,b)=>a+b,0),tot=H.reduce((a,x)=>a+cnt(x[1]),0),poss=n*d||1;
+const daily=days.map(j=>n?H.reduce((a,x)=>a+D[x[1]][j],0)/n:0),rk=H.map(x=>({n:x[0][0],g:x[0][1],p:cnt(x[1])/d,c:cnt(x[1])})).sort((a,b)=>b.p-a.p);
+const hd=H.map(x=>x);
+return `<div class="top"><div><div class="mu sm">HABIT BUILDER</div><h1>${MN[mo].toUpperCase()}</h1><div class="row" style="margin-top:10px"><select id="mo">${MN.map((m,i)=>`<option value="${i}" ${i==mo?"selected":""}>${m.slice(0,3)}</option>`).join("")}</select><b>${S.y}</b><span class="mu sm">${d} hari</span></div></div>
+<div class="row" style="gap:18px"><div><div class="mu sm">PROGRESS</div><div class="big">${(tot/poss*100).toFixed(1)}%</div><div class="mu">${tot} / ${n*d} habits</div></div><div style="width:92px">${ring(tot/poss,92)}</div></div></div>
+${area(daily)}<div class="sc" style="margin-top:8px"><table><thead><tr><th class="l">My Habits</th>${days.map(j=>`<th>${["Su","Mo","Tu","We","Th","Fr","Sa"][new Date(S.y,mo,j+1).getDay()]}<br><b>${j+1}</b></th>`).join("")}<th>Done</th></tr></thead><tbody>
+${H.map(x=>`<tr><td class="l">${esc(x[0][0])}</td>${days.map(j=>`<td><button class="cb ${D[x[1]][j]?"on":""}" data-h="${x[1]}" data-d="${j}" aria-label="${esc(x[0][0])} tanggal ${j+1}" aria-pressed="${!!D[x[1]][j]}"></button></td>`).join("")}<td><b>${cnt(x[1])}</b></td></tr>`).join("")}
+<tr><td class="l mu">Completed</td>${daily.map(v=>`<td>${Math.round(v*n)}</td>`).join("")}<td></td></tr><tr><td class="l mu">Percentage</td>${daily.map(v=>`<td class="mu">${Math.round(v*100)}</td>`).join("")}<td></td></tr></tbody></table></div>
+<div class="g2"><div><h2>ANALYTICS</h2>${H.map(x=>{const p=cnt(x[1])/d;return `<div class="ar"><span>${esc(x[0][0])}</span><div class="bar"><i style="width:${p*100}%"></i></div><span>${pc(p)} / ${pc(x[0][1])}</span><span class="mu">${cnt(x[1])}/${d}</span></div>`}).join("")||'<p class="mu">Tambahkan kebiasaan di Settings.</p>'}</div>
+<div><h2>TOP 10 MOST CONSISTENT HABITS</h2>${rk.slice(0,10).map((r,i)=>`<div class="st"><b>${i+1}</b><span>${esc(r.n)}</span><div class="bar"><i style="width:${r.p*100}%"></i></div><b>${pc(r.p)}</b></div>`).join("")}</div></div>`}
+function weekly(){const s=pd(V.wk),W=gw(V.wk);let T=0,C=0;const pcs=W.map(day=>{const t=day.filter(x=>x.t.trim()),c=t.filter(x=>x.c).length;T+=t.length;C+=c;return t.length?c/t.length:0});
+return `<div class="top"><div><div class="mu sm">WEEKLY</div><h1>TO-DO'S</h1><div class="row" style="margin-top:10px"><button class="btn" data-w="-7">‹ Minggu lalu</button><input type="date" id="wd" value="${V.wk}"><button class="btn" data-w="7">Minggu depan ›</button></div></div>
+<div style="min-width:min(100%,380px);flex:1;max-width:520px"><div class="row" style="justify-content:space-between"><div><div class="mu sm">WEEK PROGRESS</div><div class="big">${pc(T?C/T:0)}</div></div><div class="mu">${C} / ${T} completed</div></div>${bars(pcs,["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],90)}</div></div>
+<div class="days">${W.map((day,i)=>{const dt=add(s,i);return `<div class="dc"><h3>${DN[dt.getDay()]}</h3><div class="d">${pad(dt.getDate())}.${pad(dt.getMonth()+1)}.${dt.getFullYear()}</div><div class="rg">${ring(pcs[i],96)}<b>${pc(pcs[i])}</b></div><h2 style="text-align:center;border:0;margin:0">Tasks</h2>
+${day.map((x,j)=>`<div class="t ${x.c&&x.t?"dn":""}"><input data-i="${i}" data-j="${j}" value="${esc(x.t)}" aria-label="Tugas ${j+1} ${DN[dt.getDay()]}"><button class="cb ${x.c?"on":""}" data-ti="${i}" data-tj="${j}" aria-label="Selesai"></button></div>`).join("")}</div>`}).join("")}</div>`}
+function stats(){const rows=MN.map((m,mo)=>{const k=S.y+"-"+mo,D=S.m[k]||[],n=S.h.filter(h=>h[0].trim()).length,d=dim(mo),done=S.h.reduce((a,_,i)=>a+(D[i]?D[i].slice(0,d).reduce((x,y)=>x+y,0):0),0);return{m,d,done,p:n?done/(n*d):0,act:done>0}});
+const ad=rows.filter(r=>r.act).reduce((a,r)=>a+r.d,0),tot=rows.reduce((a,r)=>a+r.done,0),ph=S.h.map((h,i)=>({n:h[0],c:MN.reduce((a,_,mo)=>{const D=S.m[S.y+"-"+mo];return a+(D&&D[i]?D[i].slice(0,dim(mo)).reduce((x,y)=>x+y,0):0)},0)})).filter(x=>x.n.trim());
+return `<div class="top"><div><div class="mu sm">STATISTICS</div><h1>${S.y}</h1></div><div><div class="mu sm">HARI AKTIF ${ad}</div><div class="big">${tot} centang</div></div></div>
+<h2>MONTHLY PROGRESS</h2>${bars(rows.map(r=>r.p),rows.map(r=>r.m.slice(0,3)),120)}
+<div class="g2"><div><h2>PER BULAN</h2>${rows.map(r=>`<div class="sr"><span>${r.m}</span><div class="bar"><i style="width:${r.p*100}%"></i></div><b>${pc(r.p)}</b></div>`).join("")}</div>
+<div><h2>KONSISTENSI HABIT (TAHUN INI)</h2>${ph.map(x=>{const p=ad?x.c/ad:0;return `<div class="sr"><span>${esc(x.n)}</span><div class="bar"><i style="width:${p*100}%"></i></div><b>${pc(p)}</b></div>`}).join("")}</div></div>`}
+function settings(){return `<div class="top"><div><div class="mu sm">SETTINGS</div><h1>Kebiasaan</h1></div></div><div class="row" style="margin-bottom:16px"><label for="yr"><b>Tahun</b></label><input id="yr" type="number" value="${S.y}" style="width:90px"></div>
+<div style="max-width:520px">${S.h.map((h,i)=>`<div class="row" style="margin-bottom:6px;flex-wrap:nowrap"><b style="width:22px">${i+1}</b><input data-n="${i}" value="${esc(h[0])}" style="flex:1;min-width:0" aria-label="Nama kebiasaan ${i+1}"><input data-g="${i}" type="number" min="0" max="100" value="${Math.round(h[1]*100)}" style="width:72px" aria-label="Goal persen ${i+1}"><span class="mu">%</span></div>`).join("")}<p class="mu sm">Kosongkan nama untuk menyembunyikan kebiasaan. Data tersimpan otomatis di browser ini.</p>
+<button class="btn" id="rs">Hapus semua centang</button></div>`}
+function render(){const sx=document.querySelector(".sc"),x=sx?sx.scrollLeft:0;
+$("#nav").innerHTML=[["h","Habit Builder"],["w","Weekly To-Do's"],["s","Statistics"],["c","Settings"]].map(t=>`<button data-t="${t[0]}" class="${V.tab==t[0]?"on":""}">${t[1]}</button>`).join("");
+$("#app").innerHTML={h:habits,w:weekly,s:stats,c:settings}[V.tab]();const n=document.querySelector(".sc");if(n)n.scrollLeft=x}
+document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const D=b.dataset;
+if(D.t){V.tab=D.t}else if(D.h!==undefined){const a=gm(V.mo)[D.h];a[D.d]=a[D.d]?0:1;save()}
+else if(D.w){V.wk=iso(add(pd(V.wk),+D.w))}else if(D.ti!==undefined){const x=gw(V.wk)[D.ti][D.tj];x.c=x.c?0:1;save()}
+else if(b.id=="rs"){if(confirm("Hapus semua centang habit dan to-do?")){S.m={};Object.values(S.w).forEach(w=>w.forEach(d=>d.forEach(x=>x.c=0)));save()}else return}else return;render()});
+document.addEventListener("change",e=>{const t=e.target;if(t.id=="mo")V.mo=+t.value;else if(t.id=="wd"&&t.value)V.wk=iso(mon(pd(t.value)));else if(t.id=="yr"){S.y=+t.value||S.y;save()}else return;render()});
+document.addEventListener("input",e=>{const t=e.target,D=t.dataset;if(D.i!==undefined){gw(V.wk)[D.i][D.j].t=t.value;save()}else if(D.n!==undefined){S.h[D.n][0]=t.value;save()}else if(D.g!==undefined){S.h[D.g][1]=Math.min(1,Math.max(0,(+t.value||0)/100));save()}});
+render();
+</script></body></html>
